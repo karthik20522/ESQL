@@ -1,22 +1,30 @@
-package com.log4p.sqldsl
+/*
+ * Original Author to SQL Parser
+ * https://github.com/p3t0r/scala-sql-dsl
+ * This is a custom version of the above source
+ */
+
+package com.karthik.esql
 
 import scala.util.parsing.combinator._
 import scala.util.parsing.combinator.syntactical._
 
 class SQLParser extends JavaTokenParsers {
 
-  def query: Parser[Query] = operation ~ from ~ opt(where) ~ opt(order) ~ opt(limit) ^^ {
+  def query: Parser[Query] = (selectAll | count | defaultSelect) ~ from ~ opt(where) ~ opt(order) ~ opt(limit) ^^ {
     case operation ~ from ~ where ~ order ~ limit => Query(operation, from, where, order, limit)
   }
 
-  def operation: Parser[Operation] = {
-    ("select" | "update" | "delete") ~ repsep(ident, ",") ^^ {
-      case "select" ~ f => Select(f: _*)
-      case _ => throw new IllegalArgumentException("Operation not implemented")
-    }
+  def selectAll: Parser[Operation] = "select" ~ "*" ^^ (f => Select("_all"))
+
+  def defaultSelect: Parser[Operation] = "select" ~ repsep(ident, ",") ^^ {
+    case "select" ~ f => Select(f: _*)
+    case _ => throw new IllegalArgumentException("Operation not implemented")
   }
 
   def limit: Parser[Limit] = "limit" ~> wholeNumber ^^ (f => Limit(Integer.parseInt(f)))
+
+  def count: Parser[Count] = "select" ~ "count" ~> "(" ~> ident <~ ")" ^^ { case exp => Count(exp) }
 
   def from: Parser[From] = "from" ~> ident ^^ (From(_))
 
@@ -31,7 +39,12 @@ class SQLParser extends JavaTokenParsers {
   def predicate = (
     ident ~ "=" ~ boolean ^^ { case f ~ "=" ~ b => BooleanEquals(f, b) }
     | ident ~ "=" ~ stringLiteral ^^ { case f ~ "=" ~ v => StringEquals(f, stripQuotes(v)) }
-    | ident ~ "=" ~ wholeNumber ^^ { case f ~ "=" ~ i => NumberEquals(f, i.toInt) })
+    | ident ~ ("like" | "LIKE") ~ stringLiteral ^^ { case f ~ ("like" | "LIKE") ~ v => Like(f, stripQuotes(v)) }
+    | ident ~ "=" ~ wholeNumber ^^ { case f ~ "=" ~ i => NumberEquals(f, i.toInt) }
+    | ident ~ "<" ~ wholeNumber ^^ { case f ~ "<" ~ i => LessThan(f, i.toInt) }
+    | ident ~ "<=" ~ wholeNumber ^^ { case f ~ "<=" ~ i => LessThanEquals(f, i.toInt) }
+    | ident ~ ">" ~ wholeNumber ^^ { case f ~ ">" ~ i => GreaterThan(f, i.toInt) }
+    | ident ~ ">=" ~ wholeNumber ^^ { case f ~ ">=" ~ i => GreaterThanEquals(f, i.toInt) })
 
   def boolean = ("true" ^^^ (true) | "false" ^^^ (false))
 
