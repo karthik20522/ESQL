@@ -1,2 +1,2 @@
-EvntScala
+Elasticsearch SQL
 =========
