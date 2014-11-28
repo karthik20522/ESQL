@@ -18,6 +18,8 @@ class SQLParser extends JavaTokenParsers {
 
   def limit: Parser[Limit] = "limit" ~> wholeNumber ^^ (f => Limit(Integer.parseInt(f)))
 
+  def count: Parser[Count] = "count" ~> "(" ~> ident <~ ")" ^^ { case exp => Count(exp) }
+
   def from: Parser[From] = "from" ~> ident ^^ (From(_))
 
   def where: Parser[Where] = "where" ~> rep(clause) ^^ (Where(_: _*))
@@ -31,7 +33,12 @@ class SQLParser extends JavaTokenParsers {
   def predicate = (
     ident ~ "=" ~ boolean ^^ { case f ~ "=" ~ b => BooleanEquals(f, b) }
     | ident ~ "=" ~ stringLiteral ^^ { case f ~ "=" ~ v => StringEquals(f, stripQuotes(v)) }
-    | ident ~ "=" ~ wholeNumber ^^ { case f ~ "=" ~ i => NumberEquals(f, i.toInt) })
+    | ident ~ ("like" | "LIKE") ~ stringLiteral ^^ { case f ~ ("like" | "LIKE") ~ v => Like(f, stripQuotes(v)) }
+    | ident ~ "=" ~ wholeNumber ^^ { case f ~ "=" ~ i => NumberEquals(f, i.toInt) }
+    | ident ~ "<" ~ wholeNumber ^^ { case f ~ "<" ~ i => LessThan(f, i.toInt) }
+    | ident ~ "<=" ~ wholeNumber ^^ { case f ~ "<=" ~ i => LessThanEquals(f, i.toInt) }
+    | ident ~ ">" ~ wholeNumber ^^ { case f ~ ">" ~ i => GreaterThan(f, i.toInt) }
+    | ident ~ ">=" ~ wholeNumber ^^ { case f ~ ">=" ~ i => GreaterThanEquals(f, i.toInt) })
 
   def boolean = ("true" ^^^ (true) | "false" ^^^ (false))
 
