@@ -16,7 +16,7 @@ class SQLParser extends JavaTokenParsers {
     case operation ~ from ~ where ~ order ~ limit => Query(operation, from, where, order, limit)
   }
 
-  def selectAll: Parser[Operation] = "select" ~ "*" ^^ (f => Select("_all"))
+  def selectAll: Parser[Operation] = "select" ~ "*" ^^^ (Select("*"))
 
   def defaultSelect: Parser[Operation] = "select" ~ repsep(ident, ",") ^^ {
     case "select" ~ f => Select(f: _*)

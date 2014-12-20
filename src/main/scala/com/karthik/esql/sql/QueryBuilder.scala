@@ -7,18 +7,12 @@ package com.karthik.esql.sql
 
 import com.karthik.esql.sql
 
-case class Query(val operation: Operation, val from: From, val where: Option[Where], val order: Option[Direction] = None, val limit: Option[Limit] = None) {
-  def order(dir: Direction): Query = this.copy(order = Option(dir))
-}
+case class Query(val operation: Operation, val from: From, val where: Option[Where], val order: Option[Direction] = None, val limit: Option[Limit] = None)
 
-abstract class Operation {
-  def from(table: String) = From(table, Option(this))
-}
+abstract class Operation
 case class Select(val fields: String*) extends Operation
 case class Count(val field: String) extends Operation
-case class From(val table: String, val operation: Option[Operation] = None) {
-  def where(clauses: Clause*): Query = Query(operation.get, this, Option(Where(clauses: _*)))
-}
+case class From(val table: String)
 
 case class Where(val clauses: Clause*)
 

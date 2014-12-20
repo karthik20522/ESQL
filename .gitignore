@@ -33,3 +33,4 @@ dsa-content/src/test/resources/videos/
 .tmux.conf
 **/#*#
 **/.#*
+/data

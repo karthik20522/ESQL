@@ -93,7 +93,7 @@ class SQLParserSpec extends FunSpec with ShouldMatchers {
       val sql = """select name,age from users where name = "peter" and (active = true or age = 30)"""
       it("should be parsed into an Or object containing and And object and and Equals predicate") {
         val query = p.parse(sql).get
-        query.operation should be(Select(List("name", "age"): _*))
+        query.operation should be(Select(List[String]("name", "age"): _*))
         query.from should be(From("users"))
         query.where.get.clauses.head should be(And(StringEquals("name", "peter"), Or(BooleanEquals("active", true), NumberEquals("age", 30))))
       }
