@@ -1,6 +1,5 @@
 package com.karthik.esql
 
-import com.log4p.sqldsl._
 import scala.util.Try._
 import org.elasticsearch.node.NodeBuilder._
 import org.elasticsearch.client.Client

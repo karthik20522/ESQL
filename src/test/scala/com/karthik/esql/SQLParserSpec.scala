@@ -1,11 +1,17 @@
-package com.log4p.sqldsl
+/*
+ * Original Author to SQL Parser
+ * https://github.com/p3t0r/scala-sql-dsl
+ * This is a custom version of the above source
+ */
+
+package com.karthik.esql
 
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest._
 
 class SQLParserSpec extends FunSpec with ShouldMatchers {
   val p = new SQLParser
-  /*describe("given a sql string with an order clause") {
+  describe("given a sql string with an order clause") {
     describe("(when direction is asc)") {
       val sql = "select name from users order by name asc"
       it("should be parsed into an Asc object containing the given field") {
@@ -35,9 +41,9 @@ class SQLParserSpec extends FunSpec with ShouldMatchers {
         query.where.get.clauses.head should be(NumberEquals("age", 30))
       }
     }
-  }*/
+  }
   describe("given a sql string with a combined where clause") {
-    /*describe("(when equals predicate contains and)") {
+    describe("(when equals predicate contains and)") {
       val sql = """select name from users where name = "peter" and age = 30"""
       it("should be parsed into an And object containing to correct subclauses") {
         val query = p.parse(sql).get
@@ -62,7 +68,6 @@ class SQLParserSpec extends FunSpec with ShouldMatchers {
         query.operation should be(Select("name"))
         query.from should be(From("users"))
         query.where.get.clauses.head should be(Or(And(StringEquals("name", "peter"), NumberEquals("age", 20)), NumberEquals("age", 30)))
-        println(AnsiSqlRenderer.sql(query))
       }
     }
     describe("(when greater than predicate is provided)") {
@@ -90,7 +95,6 @@ class SQLParserSpec extends FunSpec with ShouldMatchers {
         query.operation should be(Select(List("name", "age"): _*))
         query.from should be(From("users"))
         query.where.get.clauses.head should be(And(StringEquals("name", "peter"), Or(BooleanEquals("active", true), NumberEquals("age", 30))))
-        println(AnsiSqlRenderer.sql(query))
       }
     }
     describe("(when just limit filter is provided)") {
@@ -121,35 +125,26 @@ class SQLParserSpec extends FunSpec with ShouldMatchers {
         query.from should be(From("users"))
         query.where.get.clauses.head should be(And(GreaterThan("age", 30), Like("name", "peter")))
       }
-    }*/
+    }
     describe("(when predicate contains count clauses)") {
       val sql = """select count(name) from users where age > 30 and name like "peter""""
       it("should be parsed into an AND object with correct like and greaterThan clauses") {
         val query = p.parse(sql).get
-        println(query)
-        query.operation should be(Select("name"))
+        query.operation should be(Count("name"))
         query.from should be(From("users"))
         query.where.get.clauses.head should be(And(GreaterThan("age", 30), Like("name", "peter")))
       }
     }
   }
 
-  /*  describe("give invalid sql string") {
-    describe("(when missing select statement is provided)") {
+  describe("given invalid sql string") {
+    describe("(when bad select statement is provided)") {
       val sql = "select from users"
       it("should throw an exception") {
         intercept[Exception] {
           val query = p.parse(sql).get
         }
       }
-    }*/
-  /*describe("(when query provided is in all caps)") {
-      val sql = "SELECT AGE FROM USERS"
-      it("should parse") {
-        val query = p.parse(sql).get
-        query.operation should be(Select("AGE"))
-        query.from should be(From("USERS"))
-      }
-    }*/
-  //}
+    }
+  }
 }

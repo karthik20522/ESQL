@@ -1,24 +1,30 @@
-package com.log4p.sqldsl
+/*
+ * Original Author to SQL Parser
+ * https://github.com/p3t0r/scala-sql-dsl
+ * This is a custom version of the above source
+ */
+
+package com.karthik.esql
 
 import scala.util.parsing.combinator._
 import scala.util.parsing.combinator.syntactical._
 
 class SQLParser extends JavaTokenParsers {
 
-  def query: Parser[Query] = operation ~ from ~ opt(where) ~ opt(order) ~ opt(limit) ^^ {
+  def query: Parser[Query] = (selectAll | count | defaultSelect) ~ from ~ opt(where) ~ opt(order) ~ opt(limit) ^^ {
     case operation ~ from ~ where ~ order ~ limit => Query(operation, from, where, order, limit)
   }
 
-  def operation: Parser[Operation] = {
-    ("select" | "update" | "delete") ~ repsep(ident, ",") ^^ {
-      case "select" ~ f => Select(f: _*)
-      case _ => throw new IllegalArgumentException("Operation not implemented")
-    }
+  def selectAll: Parser[Operation] = "select" ~ "*" ^^ (f => Select("_all"))
+
+  def defaultSelect: Parser[Operation] = "select" ~ repsep(ident, ",") ^^ {
+    case "select" ~ f => Select(f: _*)
+    case _ => throw new IllegalArgumentException("Operation not implemented")
   }
 
   def limit: Parser[Limit] = "limit" ~> wholeNumber ^^ (f => Limit(Integer.parseInt(f)))
 
-  def count: Parser[Count] = "count" ~> "(" ~> ident <~ ")" ^^ { case exp => Count(exp) }
+  def count: Parser[Count] = "select" ~ "count" ~> "(" ~> ident <~ ")" ^^ { case exp => Count(exp) }
 
   def from: Parser[From] = "from" ~> ident ^^ (From(_))
 

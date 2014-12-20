@@ -1,4 +1,9 @@
-package com.log4p.sqldsl
+/*
+ * Original Author to SQL Parser
+ * https://github.com/p3t0r/scala-sql-dsl
+ * This is a custom version of the above source
+ */
+package com.karthik.esql
 
 case class Query(val operation: Operation, val from: From, val where: Option[Where], val order: Option[Direction] = None, val limit: Option[Limit] = None) {
   def order(dir: Direction): Query = this.copy(order = Option(dir))
@@ -38,19 +43,3 @@ case class Asc(field: String) extends Direction
 case class Desc(field: String) extends Direction
 
 case class Limit(count: Integer)
-
-object QueryBuilder {
-  implicit def tuple2field(t: (String, String)): StringEquals = StringEquals(t._1, t._2)
-  implicit def tuple2field(t: (String, Int)): NumberEquals = NumberEquals(t._1, t._2)
-  implicit def tuple2field(t: (String, Boolean)): BooleanEquals = BooleanEquals(t._1, t._2)
-  implicit def from2query(f: From): Query = Query(f.operation.get, f, Option(Where()))
-
-  /** entrypoint for starting a select query */
-  def select(fields: String*) = Select(fields: _*)
-  def select(symbol: Symbol): Select = symbol match {
-    case 'all => select("*")
-    case _ => throw new RuntimeException("Only 'all allowed as symbol")
-  }
-
-  def in(field: String, values: String*) = In(field, values: _*)
-}
