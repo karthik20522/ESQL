@@ -4,10 +4,11 @@
  * This is a custom version of the above source
  */
 
-package com.karthik.esql
+package com.karthik.esql.sql
 
 import scala.util.parsing.combinator._
 import scala.util.parsing.combinator.syntactical._
+import com.karthik.esql._
 
 class SQLParser extends JavaTokenParsers {
 

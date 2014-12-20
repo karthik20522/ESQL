@@ -5,6 +5,8 @@ import org.elasticsearch.node.NodeBuilder._
 import org.elasticsearch.client.Client
 import org.elasticsearch.index.query._
 import org.elasticsearch.action.search._
+import com.karthik.esql.sql.SQLParser
+import com.karthik.esql.sql.Query
 
 class ESQuery(esClient: Client) {
 

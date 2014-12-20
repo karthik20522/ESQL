@@ -3,7 +3,9 @@
  * https://github.com/p3t0r/scala-sql-dsl
  * This is a custom version of the above source
  */
-package com.karthik.esql
+package com.karthik.esql.sql
+
+import com.karthik.esql.sql
 
 case class Query(val operation: Operation, val from: From, val where: Option[Where], val order: Option[Direction] = None, val limit: Option[Limit] = None) {
   def order(dir: Direction): Query = this.copy(order = Option(dir))

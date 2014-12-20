@@ -4,10 +4,11 @@
  * This is a custom version of the above source
  */
 
-package com.karthik.esql
+package com.karthik.esql.sql
 
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest._
+import com.karthik.esql.sql._
 
 class SQLParserSpec extends FunSpec with ShouldMatchers {
   val p = new SQLParser
