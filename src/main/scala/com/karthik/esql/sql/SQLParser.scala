@@ -1,9 +1,3 @@
-/*
- * Original Author to SQL Parser
- * https://github.com/p3t0r/scala-sql-dsl
- * This is a custom version of the above source
- */
-
 package com.karthik.esql.sql
 
 import scala.util.parsing.combinator._
@@ -24,11 +18,8 @@ class SQLParser extends JavaTokenParsers {
   }
 
   def limit: Parser[Limit] = "limit" ~> wholeNumber ^^ (f => Limit(Integer.parseInt(f)))
-
   def count: Parser[Count] = "select" ~ "count" ~> "(" ~> ident <~ ")" ^^ { case exp => Count(exp) }
-
   def from: Parser[From] = "from" ~> ident ^^ (From(_))
-
   def where: Parser[Where] = "where" ~> rep(clause) ^^ (Where(_: _*))
 
   def clause: Parser[Clause] = (predicate | parens) * (
@@ -50,10 +41,13 @@ class SQLParser extends JavaTokenParsers {
   def boolean = ("true" ^^^ (true) | "false" ^^^ (false))
 
   def order: Parser[Direction] = {
-    "order" ~> "by" ~> ident ~ ("asc" | "desc") ^^ {
+    ("order" ~> "by" ~> ident ~ ("asc" | "desc") ^^ {
       case f ~ "asc" => Asc(f)
       case f ~ "desc" => Desc(f)
-    }
+    }) | ("order" ~> "by" ~> repsep(ident, ",") ~ ("asc" | "desc") ^^ {
+      case f ~ "asc" => Asc(f: _*)
+      case f ~ "desc" => Desc(f: _*)
+    })
   }
 
   def stripQuotes(s: String) = s.substring(1, s.length - 1)

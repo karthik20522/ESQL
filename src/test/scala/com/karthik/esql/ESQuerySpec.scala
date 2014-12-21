@@ -3,6 +3,7 @@ package com.karthik.esql
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest._
 import com.karthik.esql.es._
+import com.karthik.esql.sql._
 import org.elasticsearch.client._
 
 import org.scalatest.mock.MockitoSugar
@@ -26,5 +27,13 @@ class ESQuerySpec extends FunSpec with ShouldMatchers with MockitoSugar {
         esQueryFields.toString() should include(""""fields" : "name""")
       }
     }
+    /*describe("(when predicate contains equals and greatherThan clauses)") {
+      val sql = """select name from users where (age = 20 or age = 30) and name = "peter""""
+      it("should be parsed into an AND object with correct equal and greaterThan clauses") {
+        val query = sqlQueryParser.parse(sql).get
+        val sqlQ = esQuery.expandWhere(query)
+        println(sqlQ)
+      }
+    }*/
   }
 }

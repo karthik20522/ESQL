@@ -1,11 +1,4 @@
-/*
- * Original Author to SQL Parser
- * https://github.com/p3t0r/scala-sql-dsl
- * This is a custom version of the above source
- */
 package com.karthik.esql.sql
-
-import com.karthik.esql.sql
 
 case class Query(val operation: Operation, val from: From, val where: Option[Where], val order: Option[Direction] = None, val limit: Option[Limit] = None)
 
@@ -35,7 +28,7 @@ case class And(val lClause: Clause, val rClause: Clause) extends Clause
 case class Or(val lClause: Clause, val rClause: Clause) extends Clause
 
 abstract class Direction
-case class Asc(field: String) extends Direction
-case class Desc(field: String) extends Direction
+case class Asc(field: String*) extends Direction
+case class Desc(field: String*) extends Direction
 
-case class Limit(count: Integer)
+case class Limit(count: Int = 75)

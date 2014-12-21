@@ -118,6 +118,15 @@ class SQLParserSpec extends FunSpec with ShouldMatchers {
         query.limit should be(Option(Limit(22)))
       }
     }
+    describe("(when mutliple order clause)") {
+      val sql = "select name from users order by age, name desc"
+      it("should be parsed into an multiple order object") {
+        val query = p.parse(sql).get
+        query.operation should be(Select("name"))
+        query.from should be(From("users"))
+        query.order should be(Option(Desc("age", "name")))
+      }
+    }
     describe("(when predicate contains like clauses)") {
       val sql = """select name from users where age > 30 and name like "peter""""
       it("should be parsed into an AND object with correct like and greaterThan clauses") {
