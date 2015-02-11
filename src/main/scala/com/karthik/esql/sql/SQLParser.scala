@@ -52,8 +52,8 @@ class SQLParser extends JavaTokenParsers {
 
   def stripQuotes(s: String) = s.substring(1, s.length - 1)
 
-  def parse(sql: String): Option[Query] = {
-    parseAll(query, sql) match {
+  def parse(sql: String): Option[Query] = {    
+    parseAll(query, sql.replace(".", "__")) match {
       case Success(r, q) => Option(r)
       case x => println(x); None
     }

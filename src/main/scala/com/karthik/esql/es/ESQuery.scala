@@ -27,10 +27,18 @@ class ESQuery(esClient: Client) {
     }
 
     //ADD FIELDS
-    getFields(query) foreach { srBuilder.addField(_) }
+    getFields(query) foreach { s=> 
+      s match {
+        case x if x == "*" => ;
+        case x => srBuilder.addField(x) 
+      }      
+    }
 
     //ADD FILTER QUERY
-    srBuilder.setQuery(QueryBuilders.queryString(expandWhere(query).getOrElse("")))
+    expandWhere(query) match {
+      case Some(q) => srBuilder.setQuery(QueryBuilders.queryString(q))
+      case _ => ;
+    }
 
     srBuilder
   }
@@ -51,6 +59,12 @@ class ESQuery(esClient: Client) {
     case StringEquals(field, value) => "%s:(%s)".format(field, quote(value))
     case BooleanEquals(field, value) => "%s:%s".format(field, value)
     case NumberEquals(field, value) => "%s:%s".format(field, value)
+    case GreaterThan(field, value) => "%s:[%s TO *]".format(field, value)
+    case LessThan(field, value) => "%s:[* TO %s]".format(field, value)
+    case GreaterThanEquals(field, value) => "%s:[%s TO *]".format(field, value)
+    case LessThanEquals(field, value) => "%s:[* TO %s]".format(field, value)
+    case Like(field, value) => "%s:(%s*)".format(field, value)
+
     case in: In => "%s in (%s)".format(in.field, in.values.map(quote(_)).mkString(","))
     case and: And => "(%s AND %s)".format(expandClause(and.lClause), expandClause(and.rClause))
     case or: Or => "(%s OR %s)".format(expandClause(or.lClause), expandClause(or.rClause))
